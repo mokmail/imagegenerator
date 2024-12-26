@@ -1,6 +1,6 @@
 const Disclaimer = () => {
     return (
-        <div className=" mx-auto p-4  text-sm w-1/2">
+        <div className=" mx-auto p-4  text-sm w-4/12">
             <h2>Disclaimer</h2>
 
             KMail.at cannot guarantee the functionality or quality of any images generated through its services. While we strive to maintain high standards and reliable processes, the accuracy, resolution, and overall quality of the generated images may vary and are dependent on several factors, including but not limited to input data, technical limitations, and user interactions.
