@@ -1,21 +1,43 @@
-
 import React, { useState } from "react";
 
-
-
 const ImageGenerator = () => {
-const huggingFaceApiKey = process.env.REACT_APP_API_KEY;
+  const huggingFaceApiKey = process.env.REACT_APP_API_KEY;
   const [prompt, setPrompt] = useState("");
   const [generatedImage, setGeneratedImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const addWatermark = async (imageBlob) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        // Add watermark
+        ctx.font = "16px Arial";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+        ctx.textAlign = "right";
+        ctx.fillText("kmail.at", canvas.width - 10, canvas.height - 10);
+
+        canvas.toBlob((watermarkedBlob) => {
+          resolve(watermarkedBlob);
+        });
+      };
+
+      img.src = URL.createObjectURL(imageBlob);
+    });
+  };
 
   const handleGenerateImage = async () => {
     setLoading(true);
     setError(null);
     setGeneratedImage(null);
 
-     // API key from .env file
     const apiUrl = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large"; // Replace with the desired model
 
     try {
@@ -33,7 +55,8 @@ const huggingFaceApiKey = process.env.REACT_APP_API_KEY;
       }
 
       const imageBlob = await response.blob();
-      const imageUrl = URL.createObjectURL(imageBlob);
+      const watermarkedBlob = await addWatermark(imageBlob);
+      const imageUrl = URL.createObjectURL(watermarkedBlob);
       setGeneratedImage(imageUrl);
     } catch (err) {
       setError("Failed to generate image. Please try again.");
@@ -44,11 +67,11 @@ const huggingFaceApiKey = process.env.REACT_APP_API_KEY;
   };
 
   return (
-    <div className=" mx-auto p-4">
-        
-      <div className="text-3xl p-4">Kmail Image generator</div>
-     
-      <textarea className="form-control border "
+    <div className="mx-auto p-4">
+      <div className="text-3xl p-4">Kmail Image Generator</div>
+
+      <textarea
+        className="form-control border w-full"
         placeholder="Enter a prompt to generate an image..."
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
@@ -57,9 +80,9 @@ const huggingFaceApiKey = process.env.REACT_APP_API_KEY;
         style={{ marginBottom: "10px", padding: "10px", fontSize: "16px" }}
       />
       <br />
-      <button className="border border-primary bg-slate-950 w-full text-white px-4 py-2 rounded"
+      <button
+        className="border border-primary bg-slate-950 w-full text-white px-4 py-2 rounded"
         onClick={handleGenerateImage}
-  
         disabled={loading}
       >
         {loading ? "Generating..." : "Generate Image"}
@@ -69,6 +92,15 @@ const huggingFaceApiKey = process.env.REACT_APP_API_KEY;
         <div style={{ marginTop: "20px" }}>
           <h3>Generated Image:</h3>
           <img src={generatedImage} alt="Generated" style={{ maxWidth: "100%" }} />
+          <br />
+          <a
+            href={generatedImage}
+            download="generated_image.png"
+            className="border border-primary bg-blue-500 text-white px-4 py-2 rounded mt-4 inline-block"
+            style={{ textDecoration: "none", marginTop: "10px" }}
+          >
+            Download Image
+          </a>
         </div>
       )}
     </div>
