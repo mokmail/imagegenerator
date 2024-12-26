@@ -6,3 +6,9 @@ const Footer = () => {
 
     <a href="http://kmail.at"> kmail.at</a>
   </div>
+    )
+    }
+
+
+
+export default Footer;

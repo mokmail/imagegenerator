@@ -2,6 +2,7 @@
 import ImageGenerator from './components/imagegenerator';
 import './App.css';
 import Disclaimer from './components/disclaimer';
+import Footer from './components/footer';
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       
      <ImageGenerator  />
      <Disclaimer />
+     <Footer/>
     </div>
   );
 }
